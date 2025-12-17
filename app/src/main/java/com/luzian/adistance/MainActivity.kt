@@ -1,21 +1,18 @@
 package com.luzian.adistance
 
 import android.Manifest
-import android.content.Context
 import android.graphics.Color
-import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import com.google.android.gms.location.*
+import androidx.compose.ui.platform.LocalContext
 import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.location.engine.LocationEngine
 import org.maplibre.android.location.modes.CameraMode
 import org.maplibre.android.maps.Style
 import org.ramani.compose.*
@@ -27,29 +24,15 @@ class MainActivity : ComponentActivity() {
     val locationPropertiesState: MutableState<LocationRequestProperties?> =
         mutableStateOf(LocationRequestProperties(interval = 5000, fastestInterval = 5000))
 
-
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var locationCallback: LocationCallback
-
-    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         requestLocationPermissions()
-
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-
-            }
-        }
 
         setContent {
             MainScreen()
         }
     }
 
-    @Suppress("MissingPermission")
     private fun requestLocationPermissions() {
         val locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions(),
@@ -58,12 +41,10 @@ class MainActivity : ComponentActivity() {
                 permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
                     locationPermGranted = true
                     locationPropertiesState.value = LocationRequestProperties(interval = 5000, fastestInterval = 5000)
-                    startLocationUpdates()
                 }
                 permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
                     locationPermGranted = true
                     locationPropertiesState.value = LocationRequestProperties(interval = 5000, fastestInterval = 5000)
-                    startLocationUpdates()
                 }
             }
         }
@@ -76,29 +57,17 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    private fun startLocationUpdates() {
-        fusedLocationClient.requestLocationUpdates(
-            createLocationRequest(),
-            locationCallback,
-            mainLooper
-        )
-    }
-
-    private fun createLocationRequest(): LocationRequest {
-        return LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000)
-            .setMinUpdateIntervalMillis(5000)
-            .build()
-    }
-
     @Composable
     private fun MainScreen() {
+        val context = LocalContext.current
         val styleUrl = remember { "asset://style.json" }
         val styleBuilder = remember { Style.Builder().fromUri(styleUrl) }
         val symbolCenter = remember { mutableStateOf(LatLng(46.0, 4.8)) }
 
         val cameraMode = rememberSaveable { mutableIntStateOf(CameraMode.TRACKING) }
         val locationProperties = remember { locationPropertiesState }
+
+        val locationEngine = remember(context) { LocationEngine(context) }
 
         val cameraPosition = remember {
             mutableStateOf(
@@ -123,7 +92,8 @@ class MainActivity : ComponentActivity() {
                 cameraPosition = cameraPosition.value,
                 cameraMode = cameraMode,
                 locationRequestProperties = locationProperties.value!!,
-                locationStyling = locationStyling
+                locationStyling = locationStyling,
+                locationEngine = locationEngine as LocationEngine?
             ) {
                 Symbol(
                     center = symbolCenter.value,
@@ -132,10 +102,5 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 }
