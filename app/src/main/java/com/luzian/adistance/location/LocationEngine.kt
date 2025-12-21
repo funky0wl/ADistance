@@ -1,4 +1,4 @@
-package com.luzian.adistance
+package com.luzian.adistance.location
 
 import android.app.PendingIntent
 import android.content.Context
@@ -13,9 +13,11 @@ import org.maplibre.android.location.engine.LocationEngineCallback
 import org.maplibre.android.location.engine.LocationEngineRequest
 import org.maplibre.android.location.engine.LocationEngineResult
 
-//MapLibre Location Engine build off the Android Docs and the interface
-//https://developer.android.com/develop/sensors-and-location/location
-//https://github.com/maplibre/maplibre-native/blob/main/platform/android/MapLibreAndroid/src/main/java/org/maplibre/android/location/engine/LocationEngine.java
+/**
+ * MapLibre Location Engine
+ *
+ * Implements the Google Play FusedLocationProviderClient
+ */
 class LocationEngine(context: Context) : LocationEngine {
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     private val listeners = mutableMapOf<LocationEngineCallback<LocationEngineResult>, LocationCallback>()
@@ -54,6 +56,8 @@ class LocationEngine(context: Context) : LocationEngine {
         val locationRequest = LocationRequest.Builder(priority, request.interval)
             .setMinUpdateIntervalMillis(request.fastestInterval)
             .setMaxUpdateDelayMillis(request.maxWaitTime)
+            .setMinUpdateDistanceMeters(5f)
+            .setMaxUpdateDelayMillis(15)
             .build()
 
         val listener = object : LocationCallback() {
