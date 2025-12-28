@@ -61,6 +61,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    implementation(libs.androidx.compose.material.icons.extended.android)
     implementation(libs.maplibre.vulkan)
     implementation(libs.ramani.maplibre) {
         exclude(group = "org.maplibre.gl", module = "android-sdk")

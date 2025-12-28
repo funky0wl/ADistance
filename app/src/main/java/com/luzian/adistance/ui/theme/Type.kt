@@ -1,4 +1,4 @@
-package com.example.adistance.ui.theme
+package com.luzian.adistance.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
