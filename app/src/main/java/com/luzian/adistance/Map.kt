@@ -29,6 +29,7 @@ import org.ramani.compose.UiSettings
  * Manages a MapLibre map instance.
  *
  * Handles user location, camera position, ui settings and map click events
+ * @property onUserLocationUpdate Callback invoked when the user location changes
  */
 @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
 class Map(private val onUserLocationUpdate: () -> Unit) {
@@ -45,11 +46,13 @@ class Map(private val onUserLocationUpdate: () -> Unit) {
     )
 
     /**
-     * Composable function that displays a MapLibre map.
+     * Composable function that renders a MapLibre map.
+     *
+     * Allows the class instance to be called directly as a Composable.
      *
      * @param modifier Modifier to apply to the MapLibre composable.
      * @param onMapClick Callback invoked with the LatLng when the user clicks on the map.
-     * @param content MapLibreComposable content to overlay on the map.
+     * @param content Optional MapLibreComposable content to overlay on the map.
      */
     @Composable
     operator fun invoke(

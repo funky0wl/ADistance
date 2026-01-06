@@ -16,7 +16,11 @@ import org.maplibre.android.location.engine.LocationEngineResult
 /**
  * MapLibre Location Engine
  *
- * Implements the Google Play FusedLocationProviderClient
+ * Implements the Google Play FusedLocationProviderClient.
+ *
+ * Note: Not all methods are implemented because they are not
+ * used by the MapLibre map. The methods are only present to satisfy the
+ * [LocationEngine] interface.
  */
 class LocationEngine(context: Context) : LocationEngine {
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)

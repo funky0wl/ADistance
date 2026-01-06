@@ -8,7 +8,9 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 /**
- * gCalculates the Haversine distance between two points.
+ * Calculates the Haversine distance between two points.
+ *
+ * Note: This calculation assumes a spherical Earth and is not perfectly accurate.
  *
  * @return Distance between the two points in meters.
  */

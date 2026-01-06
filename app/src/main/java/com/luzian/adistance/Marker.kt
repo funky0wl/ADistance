@@ -26,15 +26,30 @@ class Markers(private val onChange: () -> Unit) {
     private val trash = mutableListOf<Marker>()
     private val trashLimit = 10
 
+    /**
+     * Allows iterating over the current list of markers.
+     */
     operator fun iterator(): Iterator<Marker> {
         return markers.iterator()
     }
 
+
+    /**
+     * Adds a new marker at the specified position.
+     *
+     * @param latLng The coordinates for the new marker.
+     */
     fun add(latLng: LatLng) {
         markers.add(Marker(latLng.latitude, latLng.longitude))
         onChange()
     }
 
+    /**
+     * Removes the last added marker and stores it in the trash for potential restoration.
+     *
+     * The trash has a limit of [trashLimit] items. If the limit is reached, the oldest
+     * item in the trash is discarded.
+     */
     fun removeLast() {
         if (markers.isNotEmpty()) {
             if (trash.size < trashLimit) {
@@ -47,6 +62,9 @@ class Markers(private val onChange: () -> Unit) {
         }
     }
 
+    /**
+     * Restores the most recently removed marker from the trash.
+     */
     fun restoreLast() {
         if (trash.isNotEmpty()) {
             markers.add(trash.last())
@@ -55,17 +73,31 @@ class Markers(private val onChange: () -> Unit) {
         }
     }
 
+    /**
+     * Removes all markers and clears the trash.
+     */
     fun clear() {
         markers.removeAll(markers)
         trash.removeAll(trash)
         onChange()
     }
 
+    /**
+     * Updates the position of an existing marker.
+     *
+     * @param marker The marker to move.
+     * @param latLng The new coordinates.
+     */
     fun move(marker: Marker, latLng: LatLng) {
         marker.latLng = latLng
         onChange()
     }
 
+    /**
+     * Returns the last marker in the list.
+     *
+     * @return The last [Marker], or a dummy marker at (0.0, 0.0) if the list is empty.
+     */
     fun last(): Marker {
         return if (markers.isNotEmpty()) {
             markers.last()
@@ -74,6 +106,9 @@ class Markers(private val onChange: () -> Unit) {
         }
     }
 
+    /**
+     * Returns a list of coordinates for all current markers.
+     */
     fun toList(): List<LatLng> {
         return markers.map { it.latLng }
     }
